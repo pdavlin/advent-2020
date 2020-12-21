@@ -5,10 +5,10 @@ const inputArray: string[] = await readInputFromFile('/home/pdavlin/development/
 function parseInputLine(line: string) {
     let components = line.split(' ');
     const passwordComponents = {
-        minLength: +components[0].split('-')[0],
-        maxLength: +components[0].split('-')[1],
+        firstNumArg: +components[0].split('-')[0],
+        secondNumArg: +components[0].split('-')[1],
         targetLetter: components[1].split(':')[0],
-        input: components[2]
+        pwArray: components[2].split('')
     }
     return passwordComponents;
 
@@ -22,10 +22,21 @@ let numCorrectLines = 0;
 
 inputArray.forEach(line => {
     let pwComponents = parseInputLine(line)
-    let numTimesInInput = countOccurrences(pwComponents.input.split(''), pwComponents.targetLetter)
-    if (numTimesInInput >= pwComponents.minLength && numTimesInInput <= pwComponents.maxLength) {
+    let numTimesInInput = countOccurrences(pwComponents.pwArray, pwComponents.targetLetter)
+    if (numTimesInInput >= pwComponents.firstNumArg && numTimesInInput <= pwComponents.secondNumArg) {
         numCorrectLines +=1;
     }
 })
+console.log(`Policy 1: ${numCorrectLines} correct passwords`);
 
-console.log(numCorrectLines)
+numCorrectLines = 0;
+inputArray.forEach(line => {
+    let pwComponents = parseInputLine(line)
+    const numInFirstPosition = pwComponents.pwArray[pwComponents.firstNumArg - 1] === pwComponents.targetLetter
+    const numInThirdPosition = pwComponents.pwArray[pwComponents.secondNumArg - 1] === pwComponents.targetLetter
+    if ((numInFirstPosition && !numInThirdPosition) || (!numInFirstPosition && numInThirdPosition)) {
+        numCorrectLines += 1;
+    }
+})
+
+console.log(`Policy 2: ${numCorrectLines} correct passwords`);
